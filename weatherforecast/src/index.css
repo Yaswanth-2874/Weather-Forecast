@@ -28,7 +28,7 @@ code {
   height: 35vh;
   justify-content: space-between;
   align-items: center;
-  color:white;
+  color: white;
 }
 .tempfields {
   display: flex;
@@ -50,7 +50,7 @@ code {
   background-color: white;
   /* border: none; */
   cursor: pointer;
-  width: calc(100%/6);
+  width: calc(100% / 6);
   height: 100%;
 }
 
@@ -62,5 +62,31 @@ code {
 }
 .secondhalf img {
   width: 100px;
-  height: 100px ;
+  height: 100px;
+}
+.searchbar {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  
+ 
+}
+
+.searchbar button {
+  /* color: white; */
+  background-color: rgb(23, 203, 142);
+  cursor: pointer;
+  box-shadow: 4px 4px 4px grey;
+  /* border:1px solid rgb(237, 237, 237); */
+}
+
+.searchbar input {
+  box-shadow: 4px 4px 4px grey;
+}
+.searchbar button:hover {
+  background-color: rgb(5, 220, 148);
+}
+
+.searchbar input:focus {
+  border-color: #ccc;
 }
