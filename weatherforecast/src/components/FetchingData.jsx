@@ -11,6 +11,7 @@ export class FetchingData extends Component {
       information: [],
       inErrorState: false,
       indexing: 0,
+      query: "",
     };
   }
   componentDidMount() {
@@ -28,9 +29,14 @@ export class FetchingData extends Component {
           inErrorState: true,
         });
       });
-  };
+  }
+  setQuery = (query) => {
+    if(query === "") return `${this.state.lat},${this.state.long}`
+    return `${this.state.query}`
+  }
   UpdateData = () => {
-    const currentWeather = `https://api.weatherapi.com/v1/forecast.json?key=29a3ca58cd254f07866142055242202&q=${this.state.lat},${this.state.long}&days=6`;
+    const q = this.setQuery(this.state.query)
+    const currentWeather = `https://api.weatherapi.com/v1/forecast.json?key=29a3ca58cd254f07866142055242202&q=${q}&days=6`;
     fetch(currentWeather)
       .then((data) => {
         if (!data.ok) {
@@ -112,10 +118,11 @@ export class FetchingData extends Component {
           </h2>
         </>
       );
-    
+
     this.UpdateData();
     const { information } = this.state;
-    if (!information || !this.state.lat || !this.state.long) return <div>Loading...</div>;
+    if (!information || !this.state.lat || !this.state.long)
+      return <div>Loading...</div>;
     // console.log(information);
     const { current, location, forecast } = information;
 
@@ -187,9 +194,23 @@ export class FetchingData extends Component {
     };
     return (
       <>
-        <h1 style={{ display: "flex", justifyContent: "space-evenly" }}>
-          Weather Data
-        </h1>
+        <div className="searchbar">
+          <div>
+          <h1 style={{ display: "flex", justifyContent: "space-evenly", margin:"10px"}}>
+            Weather Data
+          </h1>
+          </div>
+          <div>
+            <input
+              type="text"
+              value={this.state.userChoice}
+              onChange={this.updateLocation}
+            />
+            <button type="submit" onClick={this.onSubmitted}>
+              Search
+            </button>
+          </div>
+          </div>
         <div className="box">
           <div className="firsthalf">
             {DisplayFunction(this.state.indexing)}
