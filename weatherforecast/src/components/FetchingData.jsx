@@ -1,6 +1,7 @@
 import React, { Component } from "react";
-import DisplayButton from "./DisplayButton";
-import DisplayFunction from "./DisplayFunction";
+import FirstHalf from "./DisplayFunction";
+import SecondHalf from "./SecondHalf";
+import ErrorState from "./ErrorState";
 
 export class FetchingData extends Component {
   constructor(props) {
@@ -100,16 +101,9 @@ export class FetchingData extends Component {
     });
     return data;
   };
+
   render() {
-    if (this.state.inErrorState)
-      return (
-        <>
-          <h2>
-            Connection timed out due to poor internet or bad query or IP Address not detected. Please try
-            Refreshing the page.
-          </h2>
-        </>
-      );
+    if (this.state.inErrorState) return <ErrorState />;
 
     this.UpdateData();
     const { information } = this.state;
@@ -147,46 +141,13 @@ export class FetchingData extends Component {
           </div>
         </div>
         <div className="box">
-          <div className="firsthalf">
-            <DisplayFunction
-              data={data}
-              index={this.state.indexing}
-              location={location}
-              current={current}
-            ></DisplayFunction>
-          </div>
-          <div className="secondhalf">
-            <DisplayButton
-              data={data}
-              func={this.handleButtonClick}
-              index={0}
-            />
-            <DisplayButton
-              data={data}
-              func={this.handleButtonClick}
-              index={1}
-            />
-            <DisplayButton
-              data={data}
-              func={this.handleButtonClick}
-              index={2}
-            />
-            <DisplayButton
-              data={data}
-              func={this.handleButtonClick}
-              index={3}
-            />
-            <DisplayButton
-              data={data}
-              func={this.handleButtonClick}
-              index={4}
-            />
-            <DisplayButton
-              data={data}
-              func={this.handleButtonClick}
-              index={5}
-            />
-          </div>
+          <FirstHalf
+            data={data}
+            index={this.state.indexing}
+            location={location}
+            current={current}
+          ></FirstHalf>
+          <SecondHalf data={data} func={this.handleButtonClick} />
         </div>
       </>
     );

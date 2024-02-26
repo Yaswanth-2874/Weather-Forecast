@@ -1,7 +1,7 @@
 import React from "react";
 
-function DisplayFunction(props) {
-  let { data, index, location, current} = props;
+function FirstHalf(props) {
+  let { data, index, location, current } = props;
   if (!location || !current) return <>Loading</>;
 
   const { name, region, country } = location;
@@ -12,11 +12,11 @@ function DisplayFunction(props) {
     icon = data[index].conditionIcon;
     temp_c = data[index].avgTempC;
     text = data[index].forecastedCondition;
-    wind_kph = data[index].maxWindKph
-    humidity = data[index].avghum
+    wind_kph = data[index].maxWindKph;
+    humidity = data[index].avghum;
   }
   return (
-    <>
+    <div className="firsthalf">
       <div className="icon">
         <img
           src={icon}
@@ -33,11 +33,10 @@ function DisplayFunction(props) {
         Date : {data[index].date}
         <br></br>
         {name}, {region}, {country}
-        <br></br>Humidity : {humidity}%<br></br>Wind Speed :{" "}
-        {wind_kph}kmph
+        <br></br>Humidity : {humidity}%<br></br>Wind Speed : {wind_kph}kmph
       </div>
-    </>
+    </div>
   );
 }
 
-export default DisplayFunction;
+export default FirstHalf;
