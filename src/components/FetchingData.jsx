@@ -1,85 +1,63 @@
-import React, { Component } from "react";
+import React from "react";
+import { useState } from "react";
+import { useEffect } from "react";
 import FirstHalf from "./DisplayFunction";
 import SecondHalf from "./SecondHalf";
 import ErrorState from "./ErrorState";
 
-export class FetchingData extends Component {
-  constructor(props) {
-    super(props);
+const FetchingData = () => {
+  const [inErrorState, setInErrorState] = useState(false);
+  const [information, setInformation] = useState();
+  const [query, setQuery] = useState("");
+  const [userChoice, setUserChoice] = useState("");
+  const [indexing, setIndexing] = useState(0);
 
-    this.state = {
-      lat: NaN,
-      long: NaN,
-      userChoice: "",
-      information: [],
-      inErrorState: false,
-      indexing: 0,
-      query: "",
-    };
-  }
-  componentDidMount() {
-    fetch("https://ipapi.co/json/")
-      .then((address) => address.json())
-      .then((values) => {
-        this.setState({
-          lat: values.latitude,
-          long: values.longitude,
-        });
-      })
-      .catch((error) => {
-        console.log(error);
-        this.setState({
-          inErrorState: true,
-        });
-      });
-  }
-  setQuery = (query) => {
-    if (query === "") return `${this.state.lat},${this.state.long}`;
-    return `${this.state.query}`;
-  };
-  UpdateData = () => {
-    const q = this.setQuery(this.state.query);
-    const currentWeather = `https://api.weatherapi.com/v1/forecast.json?key=29a3ca58cd254f07866142055242202&q=${q}&days=6`;
+  const UpdateData = () => {
+    const currentWeather = `https://api.weatherapi.com/v1/forecast.json?key=29a3ca58cd254f07866142055242202&q=${query}&days=6`;
     fetch(currentWeather)
       .then((data) => {
         if (!data.ok) {
           throw new Error();
         }
-        this.setState({
-          inErrorState: false,
-        });
+        setInErrorState(false);
         return data.json();
       })
       .then((formattedData) => {
-        this.setState({
-          information: formattedData,
-        });
+        setInformation(formattedData);
       })
       .catch(() => {
-        this.setState({
-          inErrorState: true,
-        });
+        setInErrorState(true);
       });
   };
-  updateLocation = (event) => {
-    this.setState({
-      userChoice: event.target.value,
-    });
+  /* eslint-disable react-hooks/exhaustive-deps */
+  useEffect(() => {
+    query && UpdateData();
+  }, [query]);
+  /* eslint-enable react-hooks/exhaustive-deps */
+
+  useEffect(() => {
+    fetch("https://ipapi.co/json/")
+      .then((response) => response.json())
+      .then((values) => {
+        setQuery(`${values.latitude},${values.longitude}`);
+      })
+      .catch((error) => {
+        console.log(error);
+        setInErrorState(true);
+      });
+  }, []);
+
+  const updateLocation = (e) => {
+    setUserChoice(e.target.value);
   };
-  onSubmitted = (event) => {
-    this.setState({
-      query: this.state.userChoice,
-    });
-    this.UpdateData();
+  const onSubmitted = (event) => {
+    setQuery(userChoice);
     event.preventDefault();
   };
-  handleButtonClick = (index) => {
-    this.setState({
-      indexing: index,
-    });
+  const handleButtonClick = (index) => {
+    setIndexing(index);
   };
-
-  extractDayWiseData = (dayWiseData) => {
+  const extractDayWiseData = (dayWiseData) => {
     const data = [];
 
     dayWiseData.forEach((day, index) => {
@@ -101,57 +79,45 @@ export class FetchingData extends Component {
     });
     return data;
   };
+  if (inErrorState) return <ErrorState />;
+  if (!information || !query) return <div>Loading...</div>;
+  const { current, location, forecast } = information;
+  if (!current || !location || !forecast) return <div>Loading...</div>;
+  const dayWiseData = forecast.forecastday;
+  const data = extractDayWiseData(dayWiseData);
 
-  render() {
-    if (this.state.inErrorState) return <ErrorState />;
-
-    this.UpdateData();
-    const { information } = this.state;
-    if (!information || !this.state.lat || !this.state.long)
-      return <div>Loading...</div>;
-
-    const { current, location, forecast } = information;
-    if (!current || !location || !forecast) return <div>Loading...</div>;
-    const dayWiseData = forecast.forecastday;
-    const data = this.extractDayWiseData(dayWiseData);
-
-    return (
-      <>
-        <div className="searchbar">
-          <div>
-            <h1
-              style={{
-                display: "flex",
-                justifyContent: "space-evenly",
-                margin: "10px",
-              }}
-            >
-              Weather Data
-            </h1>
-          </div>
-          <div>
-            <input
-              type="text"
-              value={this.state.userChoice}
-              onChange={this.updateLocation}
-            />
-            <button type="submit" onClick={this.onSubmitted}>
-              Search
-            </button>
-          </div>
+  return (
+    <>
+      <div className="searchbar">
+        <div>
+          <h1
+            style={{
+              display: "flex",
+              justifyContent: "space-evenly",
+              margin: "10px",
+            }}
+          >
+            Weather Data
+          </h1>
         </div>
-        <div className="box">
-          <FirstHalf
-            data={data}
-            index={this.state.indexing}
-            location={location}
-            current={current}
-          ></FirstHalf>
-          <SecondHalf data={data} func={this.handleButtonClick} />
+        <div>
+          <input type="text" value={userChoice} onChange={updateLocation} />
+          <button type="submit" onClick={onSubmitted}>
+            Search
+          </button>
         </div>
-      </>
-    );
-  }
-}
+      </div>
+      <div className="box">
+        <FirstHalf
+          data={data}
+          index={indexing}
+          location={location}
+          current={current}
+        ></FirstHalf>
+        <SecondHalf data={data} func={handleButtonClick} />
+      </div>
+    </>
+  );
+};
 
 export default FetchingData;
